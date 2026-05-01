@@ -46,5 +46,7 @@ logs/
 pyrightconfig.json
 .python-version
 
+graphify-out/
+
 # Kaggle API credentials (handled via .env)
 ~/.kaggle/kaggle.json
