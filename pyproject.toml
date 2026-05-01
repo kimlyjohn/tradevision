@@ -2,3 +2,10 @@
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-v --tb=short"
+
+[tool.mypy]
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["streamlit", "streamlit.*", "tensorflow", "tensorflow.*", "roboflow", "roboflow.*", "dotenv", "yaml"]
+ignore_missing_imports = true

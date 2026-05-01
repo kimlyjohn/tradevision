@@ -145,7 +145,7 @@ source .venv/bin/activate      # macOS / Linux
 
 # 4. Upgrade pip + install deps — all goes into the venv only
 pip install --upgrade pip
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
 # 5. When finished, deactivate
 deactivate
