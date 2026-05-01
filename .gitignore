@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+.pytest_cache/
+
+# Virtual environments (always kept local, never committed)
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+!.env.example
+
+# Data (potentially large / sensitive)
+data/raw/
+data/processed/
+
+# Trained model weights
+models/*.keras
+models/*.h5
+models/training_curves.png
+models/confusion_matrix.png
+
+# Logs
+logs/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+pyrightconfig.json
+.python-version
+
+# Kaggle API credentials (handled via .env)
+~/.kaggle/kaggle.json
