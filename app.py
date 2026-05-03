@@ -26,8 +26,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="auto",
     menu_items={
-        "Get Help": "https://github.com/youruser/tradevision",
-        "Report a bug": "https://github.com/youruser/tradevision/issues",
         "About": "TradeVision — AI chart pattern classifier",
     },
 )

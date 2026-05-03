@@ -76,7 +76,6 @@ tradevision/
 ├── data/
 │   ├── raw/
 │   ├── processed/
-│   ├── download_dataset.py
 │   └── reorganize_yolov8.py
 ├── models/
 ├── tradevision/
@@ -156,18 +155,7 @@ python data/reorganize_yolov8.py
 python -m tradevision.model.trainer
 ```
 
-The reorganization script converts the YOLO annotations into cropped class images under `data/processed/<class-name>/...`.
-
-## Optional: Acquire the Dataset Yourself
-
-This is a maintainer or fresh-clone workflow, not a required submission step.
-
-After download, rebuild the processed dataset and retrain:
-
-```bash
-python data/reorganize_yolov8.py
-python -m tradevision.model.trainer
-```
+The reorganization script converts the YOLO annotations into cropped class images under `data/processed/<split>/<class-name>/...` while preserving the original train, validation, and test boundaries.
 
 ## Makefile Shortcuts
 
