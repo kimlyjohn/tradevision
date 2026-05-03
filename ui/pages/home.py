@@ -68,12 +68,12 @@ def render_home(predictor: Predictor) -> None:
                 "its metadata are present in the local models directory."
             ),
             chips=[
-                "Step 1: python data/download_dataset.py",
-                "Step 2: python -m tradevision.model.trainer",
+                "Step 1: confirm models/tradevision_best.keras exists",
+                "Step 2: optional retrain via python -m tradevision.model.trainer",
             ],
         )
         st.error(
-            "No trained model was found. Train TradeVision locally, then refresh the workspace."
+            "No trained model was found. Restore the bundled model artifacts or retrain locally, then refresh the workspace."
         )
         render_trust_strip(
             [

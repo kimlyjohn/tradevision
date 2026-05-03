@@ -1,8 +1,9 @@
 """
 data/download_dataset.py — Download and extract the Roboflow chart pattern dataset.
 
-This script downloads a chart pattern dataset from Roboflow and organizes it
-into class folders ready for training.
+This script downloads a chart pattern dataset from Roboflow as a YOLOv8 export.
+Use ``data/reorganize_yolov8.py`` afterwards to rebuild the classifier-ready
+``data/processed/`` directory.
 
 Usage::
 
@@ -11,7 +12,6 @@ Usage::
 Prerequisites:
     - roboflow Python package installed (pip install roboflow)
     - Roboflow API key configured (set ROBOFLOW_API_KEY environment variable)
-      OR provide it interactively when prompted
 
 Configuration:
     Update the ROBOFLOW_WORKSPACE, ROBOFLOW_PROJECT, and ROBOFLOW_VERSION
@@ -72,10 +72,8 @@ def download_dataset(
     if not api_key:
         print(
             "❌  Roboflow API key not found.\n\n"
-            "Option A — Set environment variable:\n"
+            "Set an environment variable before running the script:\n"
             "  export ROBOFLOW_API_KEY=your_api_key\n\n"
-            "Option B — Add to .env file:\n"
-            "  ROBOFLOW_API_KEY=your_api_key\n\n"
             "Get your API key at: https://roboflow.com/account/api",
             file=sys.stderr,
         )
@@ -116,7 +114,8 @@ def download_dataset(
             if _.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}
         )
         print(f"📊  Total images: {image_count:,}")
-        print("\nNext step → train the model:")
+        print("\nNext steps:")
+        print("  python data/reorganize_yolov8.py")
         print("  python -m tradevision.model.trainer")
 
     except Exception as exc:  # noqa: BLE001

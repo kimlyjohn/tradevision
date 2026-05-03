@@ -5,7 +5,7 @@
 #
 # Usage:
 #   make setup      → Create .venv and install dependencies
-#   make download   → Download dataset from Kaggle
+#   make fetch-data → Optionally download dataset from Roboflow
 #   make train      → Train the model
 #   make run        → Launch the Streamlit app
 #   make test       → Run pytest suite
@@ -31,7 +31,7 @@ help:
 	@printf "  $(CYAN)TradeVision — Available Commands$(RESET)\n"
 	@printf "\n"
 	@printf "  $(GREEN)make setup$(RESET)      Create .venv + install all dependencies\n"
-	@printf "  $(GREEN)make download$(RESET)   Download dataset from Kaggle\n"
+	@printf "  $(GREEN)make fetch-data$(RESET) Optional: download dataset from Roboflow\n"
 	@printf "  $(GREEN)make train$(RESET)      Train the EfficientNetB0 model\n"
 	@printf "  $(GREEN)make run$(RESET)        Launch the Streamlit app\n"
 	@printf "  $(GREEN)make test$(RESET)       Run pytest test suite\n"
@@ -49,10 +49,10 @@ setup:
 	@echo "Virtual environment not found. Run:  make setup"
 	@exit 1
 
-# ── Dataset download ───────────────────────────────────────────────────────────
-.PHONY: download
-download: .venv/bin/python
-	@echo -e "$(CYAN)[make]$(RESET) Downloading Kaggle dataset …"
+# ── Optional dataset download ──────────────────────────────────────────────────
+.PHONY: fetch-data
+fetch-data: .venv/bin/python
+	@echo -e "$(CYAN)[make]$(RESET) Downloading dataset from Roboflow …"
 	$(PYTHON) data/download_dataset.py
 
 # ── Training ───────────────────────────────────────────────────────────────────

@@ -17,7 +17,6 @@ env/
 
 # Environment variables
 .env
-!.env.example
 
 # Data (potentially large / sensitive)
 data/raw/
@@ -47,6 +46,3 @@ pyrightconfig.json
 .python-version
 
 graphify-out/
-
-# Kaggle API credentials (handled via .env)
-~/.kaggle/kaggle.json

@@ -15,8 +15,6 @@ $ErrorActionPreference = "Stop"
 
 $VenvDir      = ".venv"
 $Requirements = "requirements.txt"
-$EnvExample   = ".env.example"
-$EnvFile      = ".env"
 
 function Write-Info    { param($msg) Write-Host "[setup] $msg" -ForegroundColor Cyan }
 function Write-Success { param($msg) Write-Host "[setup] $msg" -ForegroundColor Green }
@@ -68,16 +66,6 @@ Write-Info "Installing dependencies from $Requirements ..."
 & "$VenvDir\Scripts\pip.exe" install -r $Requirements
 Write-Success "All dependencies installed."
 
-# ── Copy .env if missing ───────────────────────────────────────────────────────
-if (-not (Test-Path $EnvFile)) {
-    if (Test-Path $EnvExample) {
-        Copy-Item $EnvExample $EnvFile
-        Write-Warn ".env created from .env.example -- please fill in your Kaggle credentials."
-    }
-} else {
-    Write-Info ".env already exists -- skipping copy."
-}
-
 # ── Print next steps ───────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "╔══════════════════════════════════════════════════════╗" -ForegroundColor Green
@@ -88,11 +76,9 @@ Write-Host "  Activate the venv before each session:" -ForegroundColor Cyan
 Write-Host "    .venv\Scripts\Activate.ps1"
 Write-Host ""
 Write-Host "  Next steps:" -ForegroundColor Cyan
-Write-Host "    1. Edit .env with your Kaggle credentials"
-Write-Host "    2. Set KAGGLE_DATASET_SLUG in config.py"
-Write-Host "    3. python data\download_dataset.py"
-Write-Host "    4. python -m tradevision.model.trainer"
-Write-Host "    5. streamlit run app.py"
+Write-Host "    1. streamlit run app.py"
+Write-Host "    2. Optional: python -m tradevision.model.trainer"
+Write-Host "    3. Optional rebuild workflow: see README.md"
 Write-Host ""
 Write-Host "  Tip: if you see an execution policy error next time, run:" -ForegroundColor Yellow
 Write-Host "    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser"
