@@ -22,16 +22,16 @@ from tradevision.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-def render_uploader() -> bytes | None:
+def render_uploader() -> tuple[bytes | None, dict[str, str | float | None]]:
     """Render the file uploader widget and validate the uploaded file.
 
     Returns:
-        Raw file bytes if a valid file was uploaded, otherwise ``None``.
+        Tuple of raw file bytes and UI metadata describing the upload state.
     """
-    st.markdown("### 📁 Upload a Trading Chart")
+    st.markdown("### Upload chart image")
     st.markdown(
-        "Upload a screenshot or export of any candlestick / OHLC chart. "
-        "Supported formats: **JPG, JPEG, PNG, WEBP** · Max size: **10 MB**"
+        "Add a candlestick or OHLC chart screenshot to run a single-pass pattern classification. "
+        f"Accepted formats: **JPG, JPEG, PNG, WEBP**. Maximum file size: **{config.MAX_FILE_SIZE_MB} MB**."
     )
 
     uploaded = st.file_uploader(
@@ -42,17 +42,18 @@ def render_uploader() -> bytes | None:
     )
 
     if uploaded is None:
-        return None
+        return None, {"status": "idle", "file_name": None, "file_size_mb": None}
 
     max_bytes = config.MAX_FILE_SIZE_MB * 1024 * 1024
+    file_size_mb = uploaded.size / (1024 * 1024) if uploaded.size is not None else None
     if uploaded.size is not None and uploaded.size > max_bytes:
         exc = FileTooLargeError(
             f"This file is too large ({uploaded.size / (1024 * 1024):.1f} MB). "
             f"Maximum allowed size is {config.MAX_FILE_SIZE_MB} MB."
         )
         logger.warning("Oversized upload rejected before read: %s (%d bytes)", uploaded.name, uploaded.size)
-        st.error(f"❌ **File too large** — {exc}")
-        return None
+        st.error(f"File too large. {exc}")
+        return None, {"status": "invalid", "file_name": uploaded.name, "file_size_mb": file_size_mb}
 
     file_bytes = uploaded.read()
     logger.info("File uploaded: name='%s' size=%d bytes", uploaded.name, len(file_bytes))
@@ -61,15 +62,19 @@ def render_uploader() -> bytes | None:
         validate_upload(uploaded.name, file_bytes)
     except UnsupportedFormatError as exc:
         logger.warning("Unsupported upload rejected: %s", uploaded.name, exc_info=True)
-        st.error(f"❌ **Unsupported file type** — {exc}")
-        return None
+        st.error(f"Unsupported file type. {exc}")
+        return None, {"status": "invalid", "file_name": uploaded.name, "file_size_mb": file_size_mb}
     except FileTooLargeError as exc:
         logger.warning("Large upload rejected after read: %s", uploaded.name, exc_info=True)
-        st.error(f"❌ **File too large** — {exc}")
-        return None
+        st.error(f"File too large. {exc}")
+        return None, {"status": "invalid", "file_name": uploaded.name, "file_size_mb": file_size_mb}
     except CorruptImageError as exc:
         logger.warning("Corrupt upload rejected: %s", uploaded.name, exc_info=True)
-        st.error(f"❌ **Corrupt or unreadable image** — {exc}")
-        return None
+        st.error(f"Unreadable image. {exc}")
+        return None, {"status": "invalid", "file_name": uploaded.name, "file_size_mb": file_size_mb}
 
-    return file_bytes
+    return file_bytes, {
+        "status": "ready",
+        "file_name": uploaded.name,
+        "file_size_mb": file_size_mb,
+    }

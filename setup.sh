@@ -11,8 +11,6 @@ set -euo pipefail
 
 VENV_DIR=".venv"
 REQUIREMENTS="requirements.txt"
-ENV_EXAMPLE=".env.example"
-ENV_FILE=".env"
 
 # ── Colour helpers ─────────────────────────────────────────────────────────────
 GREEN='\033[0;32m'
@@ -74,16 +72,6 @@ info "Installing dependencies from $REQUIREMENTS …"
 pip install -r "$REQUIREMENTS"
 success "All dependencies installed."
 
-# ── Copy .env if missing ───────────────────────────────────────────────────────
-if [[ ! -f "$ENV_FILE" ]]; then
-    if [[ -f "$ENV_EXAMPLE" ]]; then
-        cp "$ENV_EXAMPLE" "$ENV_FILE"
-        warn ".env created from .env.example — please fill in your Kaggle credentials."
-    fi
-else
-    info ".env already exists — skipping copy."
-fi
-
 # ── Print next steps ───────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════════════════════════╗${RESET}"
@@ -96,12 +84,10 @@ echo -e "    Windows CMD:    .venv\\Scripts\\activate"
 echo -e "    Windows PS:     .venv\\Scripts\\Activate.ps1"
 echo ""
 echo -e "  ${CYAN}Next steps:${RESET}"
-echo -e "    1. Edit .env with your Kaggle credentials"
-echo -e "    2. Set KAGGLE_DATASET_SLUG in config.py"
-echo -e "    3. python data/download_dataset.py"
-echo -e "    4. python -m tradevision.model.trainer"
-echo -e "    5. streamlit run app.py"
+echo -e "    1. streamlit run app.py"
+echo -e "    2. Optional: python -m tradevision.model.trainer"
+echo -e "    3. Optional rebuild workflow: see README.md"
 echo ""
 echo -e "  ${CYAN}Or use the Makefile shortcuts (macOS/Linux):${RESET}"
-echo -e "    make download | make train | make run | make test"
+echo -e "    make run | make train | make test | make fetch-data"
 echo ""

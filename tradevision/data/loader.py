@@ -1,7 +1,7 @@
 """
 tradevision/data/loader.py — Dataset loading and tf.data pipeline.
 
-Scans data/raw/ for class folders, splits into train/val/test,
+Scans data/processed/ for class folders, splits into train/val/test,
 and returns ``tf.data.Dataset`` objects ready for model.fit().
 """
 
@@ -26,7 +26,7 @@ from tradevision.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# Supported image globs when scanning the raw directory
+# Supported image globs when scanning the processed directory
 _IMAGE_EXTS = ("*.jpg", "*.jpeg", "*.png", "*.webp", "*.JPG", "*.JPEG", "*.PNG")
 
 AUTOTUNE = tf.data.AUTOTUNE
@@ -66,8 +66,8 @@ def _collect_image_paths(raw_dir: Path) -> tuple[list[Path], list[int], list[str
     """
     if not raw_dir.exists():
         raise FileNotFoundError(
-            f"Raw data directory not found: {raw_dir}\n"
-            "Run:  python data/download_dataset.py"
+            f"Processed data directory not found: {raw_dir}\n"
+            "Rebuild it with:  python data/reorganize_yolov8.py"
         )
 
     class_dirs = sorted(
@@ -151,10 +151,10 @@ def _stratified_split(
 
 
 def load_datasets(raw_dir: Path | None = None) -> DatasetBundle:
-    """Load the raw dataset, split it, and log class distribution.
+    """Load the processed dataset, split it, and log class distribution.
 
     Args:
-        raw_dir: Root of the raw dataset.  Defaults to
+        raw_dir: Root of the processed class-folder dataset. Defaults to
             :data:`config.DATA_PROCESSED_DIR`.
 
     Returns:

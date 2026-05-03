@@ -5,7 +5,6 @@ All constants, paths, and hyperparameters are defined here.
 No magic numbers anywhere else in the codebase.
 """
 
-import os
 from pathlib import Path
 
 # ─── Project root ─────────────────────────────────────────────────────────────
@@ -53,7 +52,7 @@ DENSE_UNITS: int = 256
 
 # ─── Class names ──────────────────────────────────────────────────────────────
 # Populated dynamically from folder structure by loader.py.
-# Provide fallback list matching the Kaggle chart-patterns dataset.
+# Provide a fallback list aligned with the bundled chart-pattern dataset.
 CLASS_NAMES: list[str] = [
     "Cup and Handle",
     "Double Bottom",
@@ -69,6 +68,3 @@ CLASS_NAMES: list[str] = [
     "Pennant",
     "Rounding Bottom",
 ]
-
-# ─── Kaggle dataset ───────────────────────────────────────────────────────────
-KAGGLE_DATASET_SLUG: str = os.environ.get("KAGGLE_DATASET_SLUG", "").strip()

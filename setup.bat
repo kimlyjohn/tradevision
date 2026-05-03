@@ -11,8 +11,6 @@ setlocal EnableDelayedExpansion
 
 set "VENV_DIR=.venv"
 set "REQUIREMENTS=requirements.txt"
-set "ENV_EXAMPLE=.env.example"
-set "ENV_FILE=.env"
 
 echo.
 echo [setup] Checking Python version ...
@@ -69,16 +67,6 @@ if %errorlevel% neq 0 (
 )
 echo [setup] All dependencies installed.
 
-:: ── Copy .env if missing ───────────────────────────────────────────────────────
-if not exist "%ENV_FILE%" (
-    if exist "%ENV_EXAMPLE%" (
-        copy "%ENV_EXAMPLE%" "%ENV_FILE%" >nul
-        echo [setup] .env created from .env.example -- please fill in your Kaggle credentials.
-    )
-) else (
-    echo [setup] .env already exists -- skipping copy.
-)
-
 :: ── Print next steps ───────────────────────────────────────────────────────────
 echo.
 echo ======================================================
@@ -89,14 +77,12 @@ echo   Activate the venv before each session:
 echo     .venv\Scripts\activate
 echo.
 echo   Next steps:
-echo     1. Edit .env with your Kaggle credentials
-echo     2. Set KAGGLE_DATASET_SLUG in config.py
-echo     3. python data\download_dataset.py
-echo     4. python -m tradevision.model.trainer
-echo     5. streamlit run app.py
+echo     1. streamlit run app.py
+echo     2. Optional: python -m tradevision.model.trainer
+echo     3. Optional rebuild workflow: see README.md
 echo.
 echo   Or use the Makefile (requires make for Windows):
-echo     make download ^| make train ^| make run ^| make test
+echo     make run ^| make train ^| make test ^| make fetch-data
 echo.
 
 endlocal
