@@ -49,22 +49,3 @@ EPOCHS: int = 40
 LEARNING_RATE: float = 1e-3
 DROPOUT_RATE: float = 0.40
 DENSE_UNITS: int = 256
-
-# ─── Class names ──────────────────────────────────────────────────────────────
-# Populated dynamically from folder structure by loader.py.
-# Provide a fallback list aligned with the bundled chart-pattern dataset.
-CLASS_NAMES: list[str] = [
-    "Cup and Handle",
-    "Double Bottom",
-    "Double Top",
-    "Head and Shoulders",
-    "Inverse Head and Shoulders",
-    "Rising Wedge",
-    "Falling Wedge",
-    "Ascending Triangle",
-    "Descending Triangle",
-    "Symmetrical Triangle",
-    "Flag",
-    "Pennant",
-    "Rounding Bottom",
-]

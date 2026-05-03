@@ -531,16 +531,23 @@ def apply_theme() -> None:
             }
 
             .tv-trust-strip {
-                display: flex;
-                justify-content: space-between;
-                gap: 1rem;
-                flex-wrap: wrap;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
                 border-radius: 20px;
                 border: 1px solid rgba(198, 215, 234, 0.95);
                 background: rgba(255,255,255,0.82);
                 box-shadow: var(--tv-shadow-soft);
-                padding: 1rem 1.15rem;
+                padding: 1.25rem 1.5rem;
                 margin-top: 1rem;
+            }
+
+            @media (max-width: 900px) {
+                .tv-trust-strip {
+                    grid-template-columns: 1fr;
+                    gap: 1.25rem;
+                    padding: 1rem 1.15rem;
+                }
             }
 
             .tv-error-gap {
@@ -660,6 +667,63 @@ def apply_theme() -> None:
                 padding: 0.15rem 0.35rem;
             }
 
+            /* ── Sidebar expand button (visible when sidebar is COLLAPSED) ───── */
+            /* We target the wrapper divs and the generic header button class */
+            /* specifically filtering out the top-right menu to isolate the toggle */
+            [data-testid="collapsedControl"] button,
+            [data-testid="stSidebarCollapsedControl"] button,
+            [data-testid="stHeader"] .st-emotion-cache-1rqte20 button, /* left container in header */
+            div[class*="stSidebarCollapsedControl"] button,
+            button[data-testid="baseButton-header"] {
+                background: var(--tv-primary) !important;
+                border-radius: 50% !important;
+                width: 2.3rem !important;
+                height: 2.3rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-shadow: 0 4px 14px rgba(29, 78, 216, 0.35) !important;
+                border: none !important;
+                transition: background 180ms ease, box-shadow 180ms ease !important;
+                color: #ffffff !important;
+                z-index: 99999 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+
+            [data-testid="collapsedControl"] button:hover,
+            [data-testid="stSidebarCollapsedControl"] button:hover,
+            button[data-testid="baseButton-header"]:hover {
+                background: var(--tv-primary-strong) !important;
+                box-shadow: 0 6px 20px rgba(29, 78, 216, 0.45) !important;
+            }
+
+            [data-testid="collapsedControl"] button svg,
+            [data-testid="stSidebarCollapsedControl"] button svg,
+            button[data-testid="baseButton-header"] svg {
+                color: #ffffff !important;
+                stroke: #ffffff !important;
+                fill: #ffffff !important;
+                width: 1.2rem !important;
+                height: 1.2rem !important;
+            }
+
+            /* Protect the right-side "Deploy" and "Menu" buttons from getting styled like a circle */
+            [data-testid="stToolbar"] button,
+            [data-testid="stHeader"] [data-testid="stToolbar"] button {
+                background: transparent !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                color: inherit !important;
+                width: auto !important;
+                height: auto !important;
+            }
+            [data-testid="stToolbar"] button svg {
+                color: var(--tv-text-soft) !important;
+                fill: var(--tv-text-soft) !important;
+                stroke: var(--tv-text-soft) !important;
+            }
+
             @media (max-width: 900px) {
                 .tv-result-grid {
                     grid-template-columns: 1fr;
@@ -676,6 +740,38 @@ def apply_theme() -> None:
                     animation: none !important;
                     scroll-behavior: auto !important;
                 }
+            }
+
+            /* ── Loading Skeleton Override ── */
+            /* Replaces the default Streamlit skeleton with a clean centered spinner */
+            [data-testid="stAppSkeleton"] {
+                background: var(--tv-bg) !important;
+                position: fixed !important;
+                inset: 0 !important;
+                z-index: 999999 !important;
+            }
+
+            [data-testid="stAppSkeleton"] > div {
+                display: none !important;
+            }
+
+            [data-testid="stAppSkeleton"]::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 44px;
+                height: 44px;
+                margin-top: -22px;
+                margin-left: -22px;
+                border: 4px solid rgba(29, 78, 216, 0.15);
+                border-top-color: var(--tv-primary);
+                border-radius: 50%;
+                animation: tv-spin 0.8s linear infinite;
+            }
+
+            @keyframes tv-spin {
+                to { transform: rotate(360deg); }
             }
         </style>
         """,

@@ -1,0 +1,9 @@
+[server]
+# Cap file uploads to match the MAX_FILE_SIZE_MB limit declared in config.py.
+# Without this, Streamlit defaults to 200 MB and shows that in the widget hint.
+maxUploadSize = 10
+
+[theme]
+# Force light base theme to prevent OS dark mode from turning default Streamlit
+# text and icons white, which conflicts with our custom hardcoded light background.
+base = "light"
