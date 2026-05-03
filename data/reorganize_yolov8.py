@@ -1,9 +1,8 @@
-import os
 import shutil
 from pathlib import Path
+
 import yaml
 from PIL import Image
-import numpy as np
 
 
 def main():
@@ -32,6 +31,9 @@ def main():
         if not split_img_dir.exists() or not split_lbl_dir.exists():
             continue
 
+        split_processed_dir = processed_dir / split
+        split_processed_dir.mkdir(parents=True, exist_ok=True)
+
         for img_path in split_img_dir.glob("*.*"):
             lbl_path = split_lbl_dir / (img_path.stem + ".txt")
             if not lbl_path.exists():
@@ -51,8 +53,8 @@ def main():
             # Parse polygon coordinates
             coords = [float(x) for x in first_line[1:]]
 
-            class_dir = processed_dir / class_name
-            class_dir.mkdir(exist_ok=True)
+            class_dir = split_processed_dir / class_name
+            class_dir.mkdir(parents=True, exist_ok=True)
 
             # Open image, crop to bounding box, save
             try:
@@ -70,9 +72,9 @@ def main():
 
                 if max_x > min_x and max_y > min_y:
                     cropped = img.crop((min_x, min_y, max_x, max_y))
-                    cropped.save(class_dir / f"{split}_{img_path.name}")
+                    cropped.save(class_dir / img_path.name)
                 else:
-                    img.save(class_dir / f"{split}_{img_path.name}")
+                    img.save(class_dir / img_path.name)
             except Exception as e:
                 print(f"Error processing {img_path}: {e}")
 

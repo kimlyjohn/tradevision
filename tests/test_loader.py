@@ -88,3 +88,31 @@ def test_load_datasets_rejects_classes_with_too_few_images(tmp_path: Path) -> No
 
     with pytest.raises(ValueError, match="at least 3 images"):
         load_datasets(raw_dir)
+
+
+def test_load_datasets_preserves_existing_train_valid_test_splits(tmp_path: Path) -> None:
+    processed_dir = tmp_path / "processed"
+    split_counts = {"train": 3, "valid": 2, "test": 1}
+
+    for split, count in split_counts.items():
+        split_dir = processed_dir / split
+        for class_name, pixel_value in (
+            ("ascending_triangle", 10),
+            ("double_top", 20),
+            ("flag", 30),
+        ):
+            class_dir = split_dir / class_name
+            class_dir.mkdir(parents=True)
+            for idx in range(count):
+                _write_png(class_dir / f"{split}_{idx}.png", pixel_value)
+
+    bundle = load_datasets(processed_dir)
+
+    train_count = sum(int(labels.shape[0]) for _, labels in bundle.train)
+    val_count = sum(int(labels.shape[0]) for _, labels in bundle.val)
+    test_count = sum(int(labels.shape[0]) for _, labels in bundle.test)
+
+    assert bundle.class_names == ["ascending_triangle", "double_top", "flag"]
+    assert train_count == 9
+    assert val_count == 6
+    assert test_count == 3
