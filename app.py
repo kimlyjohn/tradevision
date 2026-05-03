@@ -13,6 +13,7 @@ import streamlit as st
 
 from tradevision.inference.predictor import ModelNotFoundError, get_predictor
 from tradevision.utils.logger import get_logger
+from ui.theme import apply_theme, render_sidebar_brand
 from ui.pages.home import render_home
 from ui.pages.about import render_about
 
@@ -22,9 +23,8 @@ logger = get_logger(__name__)
 # ─── Page config ─────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="TradeVision",
-    page_icon="📈",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",
     menu_items={
         "Get Help": "https://github.com/youruser/tradevision",
         "Report a bug": "https://github.com/youruser/tradevision/issues",
@@ -32,44 +32,7 @@ st.set_page_config(
     },
 )
 
-# ─── Global CSS ──────────────────────────────────────────────────────────────
-st.markdown(
-    """
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-        html, body, [class*="css"] {
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Dark sidebar */
-        section[data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-        }
-
-        section[data-testid="stSidebar"] * {
-            color: #cbd5e1 !important;
-        }
-
-        /* Hide default Streamlit branding */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
-
-        /* Main content area */
-        .main .block-container {
-            padding-top: 1.5rem;
-            max-width: 1200px;
-        }
-
-        /* Spinner colour */
-        .stSpinner > div {
-            border-top-color: #6366f1 !important;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+apply_theme()
 
 
 # ─── Cached model loader ──────────────────────────────────────────────────────
@@ -102,9 +65,10 @@ def _about_page():
     render_about()
 
 
-home_page = st.Page(_home_page, title="Home", icon="📈", default=True)
-about_page = st.Page(_about_page, title="About", icon="ℹ️")
+home_page = st.Page(_home_page, title="Workspace", default=True)
+about_page = st.Page(_about_page, title="About")
 
+render_sidebar_brand()
 pg = st.navigation(
     {
         "TradeVision": [home_page, about_page],

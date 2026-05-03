@@ -1,125 +1,144 @@
 """
-ui/pages/about.py — About page for TradeVision.
-
-Describes the application, its limitations, dataset source, and disclaimers.
+ui/pages/about.py -- Product-quality overview and trust page.
 """
+
+from __future__ import annotations
 
 import streamlit as st
 
+from ui.theme import render_page_header, render_trust_strip
+
 
 def render_about() -> None:
-    """Render the About / information page."""
+    """Render the About / trust page."""
+    render_page_header(
+        kicker="How it works",
+        title="Model scope, methodology, and operating limits",
+        subtitle=(
+            "This page explains what the model does, what it does not do, and where caution is required."
+        ),
+        status_key="neutral",
+        status_label="Model overview",
+    )
+
+    col_left, col_right = st.columns([1.05, 0.95], gap="large")
+
+    with col_left:
+        st.markdown(
+            """
+            <section class="tv-surface tv-about-card">
+                <h3>Product purpose</h3>
+                <p>
+                    TradeVision classifies candlestick and OHLC chart screenshots into known technical pattern
+                    categories. It is designed to surface a likely visual match, expose the full confidence
+                    distribution, and flag uncertain outputs rather than overstate certainty.
+                </p>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            """
+            <section class="tv-surface tv-about-card">
+                <h3>Supported pattern families</h3>
+                <ul>
+                    <li>Head and Shoulders and Inverse Head and Shoulders</li>
+                    <li>Double Top and Double Bottom</li>
+                    <li>Cup and Handle</li>
+                    <li>Ascending, Descending, and Symmetrical Triangles</li>
+                    <li>Rising Wedge, Falling Wedge, Flag, Pennant, and Rounding Bottom</li>
+                </ul>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            """
+            <section class="tv-surface tv-about-card">
+                <h3>Model approach</h3>
+                <p>
+                    The classifier uses transfer learning with an EfficientNetB0 backbone and a custom
+                    classification head. Uploaded images are resized to 224 by 224, normalized, and scored
+                    against the learned class set. The interface then applies threshold-aware display logic
+                    so weak or ambiguous outputs are treated conservatively.
+                </p>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col_right:
+        st.markdown(
+            """
+            <section class="tv-surface tv-about-card">
+                <h3>Technology footprint</h3>
+                <table>
+                    <thead>
+                        <tr><th align="left">Layer</th><th align="left">Technology</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Interface</td><td>Streamlit</td></tr>
+                        <tr><td>Inference</td><td>TensorFlow and Keras</td></tr>
+                        <tr><td>Backbone</td><td>EfficientNetB0</td></tr>
+                        <tr><td>Image preprocessing</td><td>Pillow and NumPy</td></tr>
+                        <tr><td>Visualization</td><td>Plotly</td></tr>
+                    </tbody>
+                </table>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            """
+            <section class="tv-surface tv-about-card">
+                <h3>Limits and failure modes</h3>
+                <ul>
+                    <li>TradeVision does not forecast price direction or future returns.</li>
+                    <li>It does not issue buy, sell, hold, or risk-management signals.</li>
+                    <li>Low-confidence outputs may indicate ambiguous structure, unsupported patterns, or weak image quality.</li>
+                    <li>Results remain sensitive to dataset quality, labeling quality, and how closely the uploaded chart resembles the training distribution.</li>
+                </ul>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            """
+            <section class="tv-surface tv-about-card">
+                <h3>Dataset and training posture</h3>
+                <p>
+                    The model is trained on a chart-pattern image dataset organized by class folder. The
+                    standard pipeline uses a train, validation, and test split with augmentation applied
+                    during training only.
+                </p>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    render_trust_strip(
+        [
+            (
+                "Not financial advice",
+                "Pattern recognition output should never be treated as a substitute for regulated investment guidance.",
+            ),
+            (
+                "Best use case",
+                "TradeVision is most useful as a research companion for image classification, inspection, and model iteration.",
+            ),
+        ]
+    )
 
     st.markdown(
         """
-        <div style="text-align:center; padding:2rem 0 1rem 0;">
-            <h1 style="font-size:2.5rem; font-weight:800; color:#f1f5f9;">
-                About TradeVision
-            </h1>
-            <p style="color:#94a3b8; font-size:1.05rem;">
-                AI-powered technical chart pattern recognition
+        <section class="tv-surface tv-about-card" style="margin-top:1rem;">
+            <h3>Inference flow</h3>
+            <p>
+                Chart image input flows through resize and normalization, then into the frozen EfficientNetB0
+                feature extractor and custom dense classification head. The application surfaces the leading
+                class, confidence score, margin to the next candidate, and the ranked probability distribution.
             </p>
-        </div>
+        </section>
         """,
         unsafe_allow_html=True,
     )
-
-    st.markdown("---")
-
-    col1, col2 = st.columns(2, gap="large")
-
-    with col1:
-        st.markdown("### 🎯 What TradeVision Does")
-        st.markdown(
-            """
-            TradeVision uses **Transfer Learning** (EfficientNetB0 backbone with custom
-            classification head) to classify technical analysis patterns from candlestick
-            / OHLC chart images.
-
-            **Supported patterns include:**
-            - Head and Shoulders / Inverse H&S
-            - Double Top / Double Bottom
-            - Cup and Handle
-            - Ascending / Descending Triangle
-            - Symmetrical Triangle
-            - Rising / Falling Wedge
-            - Flag and Pennant
-            - Rounding Bottom
-
-            The model outputs a probability distribution across all pattern classes
-            and reports the most likely match along with a confidence score.
-            """
-        )
-
-        st.markdown("### 🛠️ Technology Stack")
-        st.markdown(
-            """
-            | Layer | Technology |
-            |---|---|
-            | UI | Streamlit |
-            | Deep Learning | TensorFlow / Keras |
-            | Backbone | EfficientNetB0 (ImageNet) |
-            | Preprocessing | Pillow, NumPy |
-            | Visualisation | Plotly |
-            | Training | Keras callbacks + scikit-learn |
-            """
-        )
-
-    with col2:
-        st.markdown("### ❌ What TradeVision Does NOT Do")
-        st.error(
-            "TradeVision does **not** predict future price movements, "
-            "generate buy/sell signals, or provide any form of financial advice.\n\n"
-            "Pattern recognition ≠ price prediction.",
-            icon="🚫",
-        )
-
-        st.markdown("### 📊 Dataset")
-        st.markdown(
-            """
-            The model is trained on a Kaggle chart-pattern image dataset.
-            See `data/download_dataset.py` for the dataset slug.
-
-            **Dataset characteristics:**
-            - Images: Candlestick / OHLC chart screenshots
-            - Classes: Organised by pattern type in sub-folders
-            - Split: 70% train / 15% val / 15% test
-            - Augmentation: Flip, rotate, zoom, brightness (training only)
-            """
-        )
-
-        st.markdown("### ⚠️ Disclaimer")
-        st.warning(
-            "This application is for **educational and research purposes only**.\n\n"
-            "Do not use TradeVision outputs to make real financial decisions. "
-            "Past chart patterns do not guarantee future performance. "
-            "Always consult a licensed financial advisor.",
-            icon="⚠️",
-        )
-
-    st.markdown("---")
-
-    # ── How it works ─────────────────────────────────────────────────────────
-    st.markdown("### ⚙️ How It Works")
-    st.markdown(
-        """
-        ```
-        Chart Image
-            ↓ Resize to 224×224  ·  Normalise [0,1]  ·  RGB conversion
-        EfficientNetB0 (frozen ImageNet weights)
-            ↓
-        GlobalAveragePooling2D → Dense(256, ReLU) → BatchNorm → Dropout(0.4)
-            ↓
-        Dense(num_classes, Softmax)
-            ↓
-        Pattern + Confidence Score
-        ```
-
-        The backbone weights are **frozen** during training so that only the
-        classification head learns task-specific features, preventing catastrophic
-        forgetting of ImageNet representations and reducing training time significantly.
-        """
-    )
-
-    st.markdown("---")
-    st.caption("TradeVision v0.1.0 · Built with Streamlit & TensorFlow")
