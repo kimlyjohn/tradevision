@@ -83,7 +83,10 @@ def build_model(num_classes: int) -> tf.keras.Model:
     # ── Classification head ────────────────────────────────────────────────
     x = tf.keras.layers.GlobalAveragePooling2D(name="gap")(x)
     x = tf.keras.layers.Dense(
-        config.DENSE_UNITS, activation="relu", name="dense_head"
+        config.DENSE_UNITS, 
+        activation="relu", 
+        kernel_regularizer=tf.keras.regularizers.l2(1e-4),
+        name="dense_head"
     )(x)
     x = tf.keras.layers.BatchNormalization(name="batch_norm")(x)
     x = tf.keras.layers.Dropout(config.DROPOUT_RATE, name="dropout")(x)
