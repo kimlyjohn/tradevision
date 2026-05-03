@@ -93,15 +93,11 @@ def _collect_image_paths(raw_dir: Path) -> tuple[list[Path], list[int], list[str
         paths.extend(found)
         labels.extend([idx] * len(found))
 
-    logger.info(
-        "Dataset: %d images across %d classes", len(paths), len(class_names)
-    )
+    logger.info("Dataset: %d images across %d classes", len(paths), len(class_names))
     return paths, labels, class_names
 
 
-def _load_and_decode(
-    path: tf.Tensor, label: tf.Tensor
-) -> tuple[tf.Tensor, tf.Tensor]:
+def _load_and_decode(path: tf.Tensor, label: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor]:
     """tf.data map fn: read an image file and decode to float32 pixels."""
     raw = tf.io.read_file(path)
     image = tf.image.decode_image(raw, channels=3, expand_animations=False)
@@ -155,25 +151,24 @@ def _stratified_split(
 
 
 def load_datasets(raw_dir: Path | None = None) -> DatasetBundle:
-    """Build train / val / test ``tf.data.Dataset`` pipelines.
-
-    Performs a deterministic stratified-like split by shuffling all paths
-    with a fixed seed before splitting.
+    """Load the raw dataset, split it, and log class distribution.
 
     Args:
         raw_dir: Root of the raw dataset.  Defaults to
-            :data:`config.DATA_RAW_DIR`.
+            :data:`config.DATA_PROCESSED_DIR`.
 
     Returns:
-        :class:`DatasetBundle` containing all three splits.
+        A DatasetBundle containing train, validation, and test datasets.
     """
     if raw_dir is None:
-        raw_dir = config.DATA_RAW_DIR
+        raw_dir = config.DATA_PROCESSED_DIR
 
-    paths, labels, class_names = _collect_image_paths(raw_dir)
-    train_paths, train_labels, val_paths, val_labels, test_paths, test_labels = _stratified_split(
-        paths,
-        labels,
+    image_paths, labels, class_names = _collect_image_paths(raw_dir)
+    train_paths, train_labels, val_paths, val_labels, test_paths, test_labels = (
+        _stratified_split(
+            image_paths,
+            labels,
+        )
     )
 
     if min(len(train_paths), len(val_paths), len(test_paths)) == 0:
@@ -184,7 +179,9 @@ def load_datasets(raw_dir: Path | None = None) -> DatasetBundle:
 
     logger.info(
         "Splits → train: %d | val: %d | test: %d",
-        len(train_paths), len(val_paths), len(test_paths),
+        len(train_paths),
+        len(val_paths),
+        len(test_paths),
     )
 
     augmentation = build_augmentation_layer()
