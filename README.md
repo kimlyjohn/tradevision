@@ -88,22 +88,30 @@ tradevision/
 └── tests/
 ```
 
-## Model Approach
+## Model Approach & Architecture Design
 
-TradeVision follows the **transfer learning** path from the course specification.
+TradeVision follows the **transfer learning** path from the course specification. The architecture, optimizer, and loss are defined directly in code in `tradevision/model/builder.py`.
 
-- Backbone: `EfficientNetB0`
-- Input size: `224 x 224`
-- Custom head:
-  - `GlobalAveragePooling2D`
-  - `Dense`
-  - `BatchNormalization`
-  - `Dropout`
-  - final `Dense(..., activation="softmax")`
-- Optimizer: `Adam`
-- Loss: `SparseCategoricalCrossentropy`
+### 1. Backbone and Input
+- **Backbone**: `EfficientNetB0` (or `MobileNetV2`)
+- **Input size**: `224 x 224`
+- **Why this over others**: We chose EfficientNetB0 (and MobileNetV2 as a fallback) over heavier architectures like VGG16 or ResNet50 because they offer an optimal balance between accuracy and computational efficiency. They capture complex image features without requiring excessive training time or massive hardware.
 
-The architecture, optimizer, and loss are defined directly in code in `tradevision/model/builder.py`.
+### 2. Custom Classification Head Layer Selection
+- **`GlobalAveragePooling2D`**: Flattens the feature maps from the backbone while preserving spatial context. 
+  - *Why this over others*: Chose over a standard `Flatten` layer because `Flatten` drastically increases the parameter count, which almost inevitably leads to overfitting when training on moderately sized datasets. Global Average Pooling reduces spatial dimensions gracefully and makes the model more robust to spatial translations.
+- **`Dense` Layer (with ReLU)**: Learns non-linear combinations of the extracted features. The ReLU activation introduces necessary non-linearity.
+- **`BatchNormalization`**: Accelerates training convergence and stabilizes learning by normalizing the inputs to the subsequent layer. 
+  - *Why this over others*: Chosen to mitigate internal covariate shifts. Relying on Batch Normalization is generally more robust and effective in training deep networks than solely depending on careful, manual weight initialization schemes.
+- **`Dropout`**: Randomly sets a fraction of input units to 0 during training to act as a strict regularizer.
+  - *Why this over others*: We chose Dropout as a regularizer over L1/L2 weight decay because it's highly effective at preventing the co-adaptation of neurons in dense layers. It essentially trains an ensemble of sub-networks, fundamentally reducing the risk of overfitting on our specific chart image dataset.
+- **final `Dense(..., activation="softmax")`**: The output layer that maps abstractions to class probabilities. Softmax ensures output probabilities sum to 1. 
+
+### 3. Optimizer and Loss Function
+- **Optimizer**: `Adam`
+  - *Why this over others*: The Adam (Adaptive Moment Estimation) optimizer dynamically scales updates based on the momentum of gradients. We chose this over standard SGD (Stochastic Gradient Descent) with momentum because Adam handles noisy, sparse gradients effectively and usually leads to faster, more robust convergence right out of the box with less manual learning rate tuning.
+- **Loss**: `SparseCategoricalCrossentropy`
+  - *Why this over others*: For mutually exclusive categories (a chart cannot simultaneously be a primary "Head and Shoulders" and "Double Bottom"), cross-entropy is standard. We chose the *Sparse* variant over standard `CategoricalCrossentropy` because it allows us to provide class labels as integers ($0, 1, 2\dots$) rather than requiring memory-heavy one-hot encoding matrices, making data pipelines simpler and more efficient. We bypassed Mean Squared Error since MSE is designed for continuous regression variables, not categorical probabilities.
 
 ## Training and Evaluation Outputs
 
@@ -128,7 +136,7 @@ This trains the classifier from the processed class-folder dataset and overwrite
 
 ## Optional: Rebuild `data/processed` From the Raw YOLO Export
 
-Use this only if you need to regenerate the classifier-ready dataset.
+Use this only if you need to regenerate the classifier-ready dataset. You can unzip the yolov8.zip file first.
 
 1. Ensure the YOLOv8 export is present at:
 
@@ -154,22 +162,6 @@ The reorganization script converts the YOLO annotations into cropped class image
 
 This is a maintainer or fresh-clone workflow, not a required submission step.
 
-If you do not have the bundled raw dataset, you can optionally download it from Roboflow:
-
-```bash
-ROBOFLOW_API_KEY=your_key python data/download_dataset.py
-```
-
-You may also override the dataset source:
-
-```bash
-ROBOFLOW_API_KEY=your_key \
-ROBOFLOW_WORKSPACE=your-workspace \
-ROBOFLOW_PROJECT=your-project \
-ROBOFLOW_VERSION=your-version \
-python data/download_dataset.py
-```
-
 After download, rebuild the processed dataset and retrain:
 
 ```bash
@@ -186,12 +178,11 @@ make setup
 make run
 make train
 make test
-make fetch-data
 ```
 
 - `make run` launches the Streamlit UI
 - `make train` retrains from `data/processed`
-- `make fetch-data` is optional and downloads the raw dataset from Roboflow
+
 
 ## Run Tests
 

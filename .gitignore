@@ -19,15 +19,9 @@ env/
 .env
 
 # Data (potentially large / sensitive)
-data/raw/
+# data/raw/
 data/processed/
-
-# Trained model weights
-models/*.keras
-models/*.h5
-models/training_curves.png
-models/confusion_matrix.png
-
+*.yolov8
 # Logs
 logs/
 
