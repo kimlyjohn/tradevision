@@ -177,7 +177,46 @@ def train() -> None:
     logger.info("Loading best checkpoint for evaluation …")
     best_model = tf.keras.models.load_model(str(config.MODEL_PATH))
 
-    # 4. Training curves
+    # 4. Fine-tuning Phase
+    logger.info("═══ Starting Fine-Tuning Phase ═══")
+    logger.info("Unfreezing backbone layers (keeping BatchNormalization frozen) ...")
+    
+    for layer in best_model.layers:
+        if isinstance(layer, tf.keras.layers.BatchNormalization):
+            layer.trainable = False
+        else:
+            layer.trainable = True
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=config.FINETUNE_LEARNING_RATE)
+    best_model.compile(
+        optimizer=optimizer,
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+        metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name="accuracy")],
+    )
+
+    best_model.summary(print_fn=logger.info)
+
+    logger.info(
+        "Fine-tuning: epochs=%d | lr=%s",
+        config.FINETUNE_EPOCHS, config.FINETUNE_LEARNING_RATE,
+    )
+    
+    ft_history = best_model.fit(
+        bundle.train,
+        validation_data=bundle.val,
+        epochs=config.FINETUNE_EPOCHS,
+        callbacks=_build_callbacks(),
+    )
+
+    # Reload best model from fine-tuning
+    logger.info("Loading best fine-tuned checkpoint for evaluation …")
+    best_model = tf.keras.models.load_model(str(config.MODEL_PATH))
+
+    # Append fine-tuning history to initial history for full curve plot
+    for key in history.history:
+        history.history[key].extend(ft_history.history[key])
+
+    # 5. Training curves
     _plot_training_curves(history)
 
     # 5. Evaluate on test set

@@ -31,9 +31,9 @@ SUPPORTED_FORMATS: list[str] = [".jpg", ".jpeg", ".png", ".webp"]
 MAX_FILE_SIZE_MB: int = 10
 
 # ─── Inference ────────────────────────────────────────────────────────────────
-CONFIDENCE_THRESHOLD: float = 0.60
-CONFIDENCE_MARGIN_THRESHOLD: float = 0.15
-REJECTION_LABEL: str = "Unrecognized or unsupported chart pattern"
+CONFIDENCE_THRESHOLD: float = 0.50
+CONFIDENCE_MARGIN_THRESHOLD: float = 0.12
+REJECTION_LABEL: str = "Unrecognized Chart Pattern"
 TOP_N_CLASSES: int = 5          # how many bars to show in confidence chart
 
 # ─── Dataset split ratios (must sum to 1.0) ──────────────────────────────────
@@ -47,5 +47,7 @@ BACKBONE: str = "EfficientNetB0"
 BATCH_SIZE: int = 32
 EPOCHS: int = 40
 LEARNING_RATE: float = 1e-3
-DROPOUT_RATE: float = 0.40
-DENSE_UNITS: int = 256
+DROPOUT_RATE: float = 0.50
+DENSE_UNITS: int = 128
+FINETUNE_EPOCHS: int = 20
+FINETUNE_LEARNING_RATE: float = 1e-5
